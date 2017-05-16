@@ -2,6 +2,7 @@ import pygame
 import time
 import math
 import numpy as np
+import NN_Coordinates as cd
 FPS = 30
 SCREEN_WIDTH = 1100
 SCREEN_HEIGHT = 700
@@ -11,91 +12,91 @@ RED = (200, 20, 0)
 GREEN = (0, 220, 10)
 BLUE = (0, 0, 200)
 BLACK = (0,0,0)
-# yes its hard coded what did you think >.<
-C_1_1_1 = [[235,255],[495,202],[754,254]]
-C_1_1_2 = [[235,255],[495,202],[754,358]]
-C_1_2_1 = [[235,255],[495,306],[754,358]]
-C_1_2_2 = [[235,255],[495,306],[754,358]]
-C_1_3_1 = [[235,255],[495,410],[754,255]]
-C_1_3_2 = [[235,255],[495,410],[754,358]]
-C_1_4_1 = [[235,255],[495,514],[754,254]]
-C_1_4_2 = [[235,255],[495,514],[754,358]]
-C_1_5_1 = [[235,255],[495,617],[754,254]]
-C_1_5_2 = [[235,255],[495,617],[754,358]]
 
-C_2_1_1 = [[235,357],[495,202],[754,254]]
-C_2_1_2 = [[235,357],[495,202],[754,358]]
-C_2_2_1 = [[235,357],[495,306],[754,358]]
-C_2_2_2 = [[235,357],[495,306],[754,358]]
-C_2_3_1 = [[235,357],[495,410],[754,254]]
-C_2_3_2 = [[235,357],[495,410],[754,358]]
-C_2_4_1 = [[235,357],[495,514],[754,254]]
-C_2_4_2 = [[235,357],[495,514],[754,358]]
-C_2_5_1 = [[235,357],[495,617],[754,254]]
-C_2_5_2 = [[235,357],[495,617],[754,358]]
+##########      DATA     ##################
+X = np.round(np.random.rand(20,2),2)
 
-X = np.array([[69691,222],[2,2],[1.1,2.2]])
-print("X: ", X)
 
-W1_C_1 = [[415,190],[421,273],[420,354],[430,440],[420,511]]
-W1_C_2 = [[378,251],[372,305],[364,367],[371,428],[343,479]]
-
+##########  SIMULATION   ##################
 class Sim(object):
     def __init__(self, screen):
         self.run_sim = True
-        self.input_layer = []
-        # self.initialize_display(screen)
-
-        self.BackGround = Background('nn.png', [0,0])
-        self.Blobs =[Blob(C_1_1_1), Blob(C_1_1_2)]
-        self.Blobs.extend((Blob(C_1_2_1),Blob(C_1_2_2)))
-        self.Blobs.extend((Blob(C_1_3_1),Blob(C_1_3_2)))
-        self.Blobs.extend((Blob(C_1_4_1),Blob(C_1_4_2)))
-        self.Blobs.extend((Blob(C_1_5_1),Blob(C_1_5_2)))
-        self.Blobs.extend((Blob(C_2_1_1),Blob(C_2_1_2)))
-        self.Blobs.extend((Blob(C_2_2_1),Blob(C_2_2_2)))
-        self.Blobs.extend((Blob(C_2_3_1),Blob(C_2_3_2)))
-        self.Blobs.extend((Blob(C_2_4_1),Blob(C_2_4_2)))
-        self.Blobs.extend((Blob(C_2_5_1),Blob(C_2_5_2)))
+        self.show_Weights = True
         self.clear = True
+        self.f_stage = 0
+        self.input_pos = 0
+        self.initialize_display(screen)
 
         self.NN = Neural_Network()
-        self.show_Weights = True
+
+    def initialize_display(self, sceen):
         self.small_font = pygame.font.SysFont(None, 30)
-        
+        self.BackGround = Background('nn.png', [0,0])
 
-
+        self.Blobs =[Blob(cd.C_1_1_1), Blob(cd.C_1_1_2)]
+        self.Blobs.extend((Blob(cd.C_1_2_1),Blob(cd.C_1_2_2)))
+        self.Blobs.extend((Blob(cd.C_1_3_1),Blob(cd.C_1_3_2)))
+        self.Blobs.extend((Blob(cd.C_1_4_1),Blob(cd.C_1_4_2)))
+        self.Blobs.extend((Blob(cd.C_1_5_1),Blob(cd.C_1_5_2)))
+        self.Blobs.extend((Blob(cd.C_2_1_1),Blob(cd.C_2_1_2)))
+        self.Blobs.extend((Blob(cd.C_2_2_1),Blob(cd.C_2_2_2)))
+        self.Blobs.extend((Blob(cd.C_2_3_1),Blob(cd.C_2_3_2)))
+        self.Blobs.extend((Blob(cd.C_2_4_1),Blob(cd.C_2_4_2)))
+        self.Blobs.extend((Blob(cd.C_2_5_1),Blob(cd.C_2_5_2)))
 
     def process_events(self, screen):
-
         if self.run_sim is True:
-
+            self.display_frame(screen)
             for blob in enumerate(self.Blobs):
                 blob[1].move()
-
-            self.display_frame(screen)
             for event in pygame.event.get():
                 if event.type is pygame.KEYDOWN:
                     if event.key is pygame.K_x:
                         # pygame.display.quit()
                         pygame.quit()
-                    if event.key is pygame.K_g:
+                    # if event.key is pygame.K_g:
+                    #     if self.clear is True:
+                    #         if self.f_stage is 0 or self.f_stage is 2:
+                    #             for blob in enumerate(self.Blobs):
+                    #                 blob[1].step = True
+                    #                 blob[1].move()
+                    #         self.f_stage += 1
+                    #         self.NN.forward_step(self.f_stage, X[self.input_pos,:])
+                    #         print("f_stage: ", self.f_stage)
+                    #         if self.f_stage is 5:
+                    #             for blob in enumerate(self.Blobs):
+                    #                 blob[1].Reset = True
+                    #             self.f_stage = 0
+                    #             self.input_pos += 1
 
-                        if self.clear is True:
-                            for blob in enumerate(self.Blobs):
-                                blob[1].step = True
-                                blob[1].move()
-                            self.NN.forward_W1(X[0,:])
+            if self.clear is True:
+
+                if self.f_stage is 0 or self.f_stage is 2:
+                    #time.sleep(1)
+                    for blob in enumerate(self.Blobs):
+                        blob[1].step = True
+                        blob[1].move()
 
 
+                self.f_stage += 1
+                print("f_stage: ", self.f_stage)
+                if self.f_stage is 5:
+                    for blob in enumerate(self.Blobs):
+                        blob[1].Reset = True
+                    self.f_stage = 0
+                    self.input_pos += 1
+
+            self.clear = True
             for blob in enumerate(self.Blobs):
                 if blob[1].step is True:
                     self.clear = False
-                else:
-                    self.clear = True
 
+        self.NN.forward_step(self.f_stage, X[self.input_pos, :])
 
         pygame.display.flip()
+
+    #######################################
+
     def display_frame(self, screen):
         screen.fill([255, 255, 255])
         screen.blit(self.BackGround.image, self.BackGround.rect)
@@ -105,19 +106,33 @@ class Sim(object):
 
         if self.show_Weights is True:
             # draw inputs 
-            screen.blit(self.small_font.render(str(X[self.NN.input_number,0]), True, RED), [160,232])
-            screen.blit(self.small_font.render(str(X[self.NN.input_number,1]), True, BLUE), [160,336])
+            screen.blit(self.small_font.render(str(X[self.input_pos,0]), True, RED), [160,232])
+            screen.blit(self.small_font.render(str(X[self.input_pos,1]), True, BLUE), [160,336])
             for i in range(self.NN.input_layer_size):
                 for j in range(self.NN.hidden_layer_size):
-                    # draw first input weights
-                    screen.blit(self.small_font.render(str(round(self.NN.W1[0,j], 2)), True, RED), W1_C_1[j])
-                    # draw second input weights 
-                    screen.blit(self.small_font.render(str(round(self.NN.W1[1,j], 2)), True, BLUE), W1_C_2[j])
-           # draw outputs ** INSERT TRUE OUTPUTS
-            screen.blit(self.small_font.render(str(X[self.NN.input_number,0]), True, RED), [789,232])
-            screen.blit(self.small_font.render(str(X[self.NN.input_number,1]), True, BLUE), [791,3364])
+                    # draw input weights
+                    screen.blit(self.small_font.render(str(round(self.NN.W1[0,j], 2)), True, RED), cd.W1_C_1[j])
+                    screen.blit(self.small_font.render(str(round(self.NN.W1[1,j], 2)), True, BLUE), cd.W1_C_2[j])
+                    screen.blit(self.small_font.render(str(round(self.NN.W2[j,0], 2)), True, RED), cd.W2_C_1[j])
+                    screen.blit(self.small_font.render(str(round(self.NN.W2[j,1], 2)), True, BLUE), cd.W2_C_2[j])
+
+            # Show Hidden Layer Values
+            for i in range(len(self.NN.z2)):
+                screen.blit(self.small_font.render(str(np.round(self.NN.z2[i], 2)), True, BLACK), cd.HIDDEN_C[i])
+
+            for i in range(len(self.NN.z3)):
+                screen.blit(self.small_font.render(str(np.round(self.NN.z3[i], 2)), True, BLACK), cd.OUT_C[i])
+
+##############################################################################
+##############################################################################
+
+
+##############################################################################
+##############################################################################
+
 class Blob(object):
     def __init__(self, cordinates, color=None):
+        self.Reset = False
         if color is None:
             self.color = GREEN
         else:
@@ -127,26 +142,30 @@ class Blob(object):
         self.current_pos = list(self.cordinates[0])
         self.next_pos = 1
         self.step = False
+        # step means I am nid cordinates waiting for a move stage
 
     def move(self):
-
-        delta_x = self.cordinates[self.next_pos][0]-self.current_pos[0]
-        delta_y = self.cordinates[self.next_pos][1]-self.current_pos[1]
-        displacement_vector = np.array([delta_x, delta_y])
-        unit_vector = displacement_vector/np.sqrt(np.sum(displacement_vector**2))*10
-        dx = int(round(unit_vector[0]))
-        dy = int(round(unit_vector[1]))
-
         if self.step is True:
+            delta_x = self.cordinates[self.next_pos][0]-self.current_pos[0]
+            delta_y = self.cordinates[self.next_pos][1]-self.current_pos[1]
+            displacement_vector = np.array([delta_x, delta_y])
+            unit_vector = displacement_vector/np.sqrt(np.sum(displacement_vector**2))*10
+            dx = int(round(unit_vector[0]))
+            dy = int(round(unit_vector[1]))
 
-            self.current_pos[0] += dx*2
-            self.current_pos[1] += dy*2
+
+            self.current_pos[0] += dx*3
+            self.current_pos[1] += dy*3
         if abs(self.current_pos[0]-self.cordinates[self.next_pos][0]) < 15:
             if abs(self.current_pos[1]-self.cordinates[self.next_pos][1]) < 15:
                 self.step = False
                 if self.next_pos is len(self.cordinates)-1:
-                    self.current_pos = list(self.cordinates[0])
-                    self.next_pos = 1
+                    # STOP
+                    if self.Reset is True:
+                    
+                        self.current_pos = list(self.cordinates[0])
+                        self.next_pos = 1
+                        self.Reset = False # I have been reset
                 else:
                     self.next_pos += 1
     def draw(self,screen):
@@ -163,6 +182,19 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = location
 
+
+
+
+
+
+
+
+##############################################################################
+##############################################################################
+##############################################################################
+
+
+##############################################################################
 class Neural_Network(object):
     def __init__(self):
         self.input_layer_size = 2
@@ -171,6 +203,8 @@ class Neural_Network(object):
 
         self.W1 = np.random.randn(self.input_layer_size, self.hidden_layer_size)
         self.W2 = np.random.randn(self.hidden_layer_size, self.output_layer_size)
+        self.z2 = np.zeros(5)
+        self.z3 = np.zeros(2)
 
         self.input_number = 0
     def forward(self, X):
@@ -179,12 +213,36 @@ class Neural_Network(object):
         self.z3 = np.dot(self.a2, self.W2)
         yHat = self.sigmoid(self.z3)
         return yHat
-    def forward_W1(self, X):
-        self.z2 = np.dot(X, self.W1)
-        return self.z2
+    def forward_step(self, stage, X):
+        if stage is 1:
+            print("stage 1 dot input w/ weight 1")
+            self.z2 = np.dot(X, self.W1)
+            print(self.z2)
+            return self.z2
+        if stage is 2:
+            # let z2 be our a2
+            self.z2 = self.sigmoid(self.z2)
+        if stage is 3:
+            # z2 has had the activation function applied thus z2 = a2
+            self.z3 = np.dot(self.z2, self.W2)
+        if stage is 4:
+            # let z3 represent our y hat these substitutions are done to make the simulation easier
+            self.z3 = self.sigmoid(self.z3)
+
 
     def sigmoid(self, z):
         return 1/(1+np.exp(-z))
+
+##############################################################################
+##############################################################################
+##############################################################################
+
+
+
+
+
+##############################################################################
+##############################################################################
 
 def main():
     pygame.init()
@@ -202,6 +260,5 @@ def main():
     yhat = NN.forward(X)
     print(yhat)
     print(NN.W1)
-    
 
 main()
