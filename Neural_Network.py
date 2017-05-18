@@ -4,6 +4,7 @@ import numpy as np
 ##############################################################################
 class Neural_Network(object):
 	def __init__(self, input_size, layers, output_size):
+		self.all_Layers = [input_size] + layers + [output_size]
 		self.input_layer_size = input_size
 		self.hidden_layer_size = len(layers)
 		self.output_layer_size = output_size
@@ -48,8 +49,7 @@ class Neural_Network(object):
 			self.weights[i] += adjustments[i]
 
 	def sigmoid_prime(self, x):
-		return  x * (1-x)
-
+		return x * (1 - x)
 
 
 ##############################################################################
@@ -62,15 +62,13 @@ import pandas as pd
 from keras.utils import np_utils
 
 
-
 def main():
 	iris_data = pd.read_csv("Iris.csv")
 	iris_data = shuffle(iris_data)
 	labelencoder = LabelEncoder()
-
 	for col in iris_data.columns:
 		iris_data[col] = labelencoder.fit_transform(iris_data[col])
-	#print(iris_data.head())
+	# print(iris_data.head())
 
 	labels = np.array(iris_data["Species"])
 
@@ -78,8 +76,6 @@ def main():
 	labels = labelencoder.transform(labels)
 	labels = np_utils.to_categorical(labels)
 	y_train = labels[:100]
-
-
 	y_test = labels[100:150]
 
 	X = iris_data.iloc[:, 1:5]
@@ -89,6 +85,7 @@ def main():
 	X_train = np.array(X[:100])
 	X_test = np.array(X[100:150])
 
+	# hidden_layer_list = [int(x) for x in input("Enter Hidden Layers: ").split()]
 	hidden_layer_list = [10, 8, 5, 3]
 	NN = Neural_Network(4, hidden_layer_list, 3)
 	for i in range(500000):
@@ -98,4 +95,137 @@ def main():
 		if (i % 10000) == 0:
 			print("Error: ", np.mean(np.abs(error)))
 
-main()
+
+import pygame
+import time
+
+FPS = 30
+SCREEN_SIZE = (1200, 800)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+
+
+class Sim(object):
+	def __init__(self):
+		self.run_sim = True
+
+	def process_events(self, screen):
+		if self.run_sim is True:
+			for event in pygame.event.get():
+				if event.type is pygame.KEYDOWN:
+					if event.key is pygame.K_x:
+						pygame.display.quit()
+						pygame.quit()
+		pygame.display.flip()
+
+	def display_frame(self, screen, sizes, weights):
+		screen.fill(BLACK)
+		self.draw_neurons(screen, sizes, weights)
+		if self.run_sim is True:
+			pass
+
+	def draw_neurons(self, screen, sizes, weights):
+		initial_Y = 400
+		buffer = 70
+		x_buffer = 100
+		coordinates = []
+		column = []
+		for x in range(len(sizes)):
+			if sizes[x] % 2 is 0:
+				offset = -(sizes[x])//2 * buffer
+			else:
+				offset = -(sizes[x]-1) // 2 * buffer - buffer//2
+			for y in range(sizes[x]):
+
+				x_pos = (x + 1) * x_buffer
+				y_pos = (y+1)* buffer + initial_Y + offset
+				#print("coordinates:",x,y, x_pos, y_pos)
+
+				pygame.draw.circle(screen, (255, 200, 200), (x_pos, y_pos), buffer//2, buffer//2)
+				column.append((x_pos, y_pos))
+			coordinates.append(list(column))
+			column.clear()
+
+
+
+		for i in range(len(sizes)-1):
+			current_weights = weights[i]
+			for j in range(len(coordinates[i])):
+				for k in range(len(coordinates[i+1])):
+					x_final = coordinates[i+1][k][0]
+					y_final = coordinates[i+1][k][1]
+					thickness = int(current_weights[j][k]/2)
+					if thickness is 0:
+						thickness = 1
+					if thickness < 0:
+						thickness = abs(thickness)
+						color = RED
+					else:
+						color = GREEN
+					#print(thickness)
+					pygame.draw.line(screen, color, coordinates[i][j], (x_final, y_final), thickness)
+
+
+
+def Sim_main():
+	iris_data = pd.read_csv("Iris.csv")
+	iris_data = shuffle(iris_data)
+	labelencoder = LabelEncoder()
+	for col in iris_data.columns:
+		iris_data[col] = labelencoder.fit_transform(iris_data[col])
+	# print(iris_data.head())
+
+	labels = np.array(iris_data["Species"])
+
+	labelencoder.fit(labels)
+	labels = labelencoder.transform(labels)
+	labels = np_utils.to_categorical(labels)
+	y_train = labels[:100]
+	y_test = labels[100:150]
+
+	X = iris_data.iloc[:, 1:5]
+	scaler = StandardScaler()
+	X = scaler.fit_transform(X)
+
+	X_train = np.array(X[:100])
+	X_test = np.array(X[100:150])
+
+	# hidden_layer_list = [int(x) for x in input("Enter Hidden Layers: ").split()]
+	hidden_layer_list = [8,6,4]
+	NN = Neural_Network(4, hidden_layer_list, 3)
+
+
+	pygame.init()
+	screen = pygame.display.set_mode(SCREEN_SIZE)
+	pygame.display.set_caption('~~wow~~')
+	clock = pygame.time.Clock()
+	simulation = Sim()
+
+
+
+	for i in range(20000):
+		predictions = NN.forward(X_train)
+		error = y_train - predictions
+		NN.back_prop(error, X_train)
+		if (i % 100) == 0:
+			print("Error: ", np.mean(np.abs(error)))
+
+	#while True:
+		simulation.process_events(screen)
+		simulation.display_frame(screen, NN.all_Layers, NN.weights)
+		#clock.tick(FPS)
+	pygame.quit()
+
+
+
+
+
+Sim_main()
+
+
+
+# main()
