@@ -101,13 +101,16 @@ import time
 
 FPS = 30
 SCREEN_SIZE = (1200, 800)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
+GREEN = (0, 205, 102)
+RED = (220, 20, 60)
+BLUE = (0,245,255)
+PURPLE = (224,102,255)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+GOLD = (255,215,0)
 
-
+GRAY = (110,110,110)
 
 class Sim(object):
 	def __init__(self):
@@ -123,14 +126,14 @@ class Sim(object):
 		pygame.display.flip()
 
 	def display_frame(self, screen, sizes, weights):
-		screen.fill(BLACK)
+		screen.fill(GRAY)
 		self.draw_neurons(screen, sizes, weights)
 		if self.run_sim is True:
 			pass
 
 	def draw_neurons(self, screen, sizes, weights):
-		initial_Y = 400
-		buffer = 70
+		initial_Y = 350
+		buffer = 100
 		x_buffer = 100
 		coordinates = []
 		column = []
@@ -143,9 +146,13 @@ class Sim(object):
 
 				x_pos = (x + 1) * x_buffer
 				y_pos = (y+1)* buffer + initial_Y + offset
-				#print("coordinates:",x,y, x_pos, y_pos)
-
-				pygame.draw.circle(screen, (255, 200, 200), (x_pos, y_pos), buffer//2, buffer//2)
+				if x is 0:
+					color = BLUE
+				elif x is len(sizes)-1:
+				 	color = GOLD
+				else:
+					color = PURPLE
+				pygame.draw.circle(screen, color, (x_pos, y_pos), buffer//3, buffer//3)
 				column.append((x_pos, y_pos))
 			coordinates.append(list(column))
 			column.clear()
@@ -158,7 +165,7 @@ class Sim(object):
 				for k in range(len(coordinates[i+1])):
 					x_final = coordinates[i+1][k][0]
 					y_final = coordinates[i+1][k][1]
-					thickness = int(current_weights[j][k]/2)
+					thickness = int(current_weights[j][k]/4)
 					if thickness is 0:
 						thickness = 1
 					if thickness < 0:
@@ -184,18 +191,18 @@ def Sim_main():
 	labelencoder.fit(labels)
 	labels = labelencoder.transform(labels)
 	labels = np_utils.to_categorical(labels)
-	y_train = labels[:100]
+	y_train = labels[:150]
 	y_test = labels[100:150]
 
 	X = iris_data.iloc[:, 1:5]
 	scaler = StandardScaler()
 	X = scaler.fit_transform(X)
 
-	X_train = np.array(X[:100])
+	X_train = np.array(X[:150])
 	X_test = np.array(X[100:150])
 
 	# hidden_layer_list = [int(x) for x in input("Enter Hidden Layers: ").split()]
-	hidden_layer_list = [8,6,4]
+	hidden_layer_list = [4]
 	NN = Neural_Network(4, hidden_layer_list, 3)
 
 
@@ -207,16 +214,17 @@ def Sim_main():
 
 
 
-	for i in range(20000):
+	for i in range(200000):
 		predictions = NN.forward(X_train)
 		error = y_train - predictions
 		NN.back_prop(error, X_train)
-		if (i % 100) == 0:
+		if (i % 1000) == 0:
 			print("Error: ", np.mean(np.abs(error)))
 
 	#while True:
-		simulation.process_events(screen)
-		simulation.display_frame(screen, NN.all_Layers, NN.weights)
+		if i % 1000 is 0:
+			simulation.process_events(screen)
+			simulation.display_frame(screen, NN.all_Layers, NN.weights)
 		#clock.tick(FPS)
 	pygame.quit()
 
