@@ -34,8 +34,8 @@ class Sim(object):
 
     def draw_neurons(self, screen, sizes, weights):
         initial_Y = 350
-        buffer = 100
-        x_buffer = 100
+        buffer = 90
+        x_buffer = 150
         coordinates = []
         column = []
         for x in range(len(sizes)):
@@ -64,7 +64,7 @@ class Sim(object):
                 for k in range(len(coordinates[i + 1])):
                     x_final = coordinates[i + 1][k][0]
                     y_final = coordinates[i + 1][k][1]
-                    thickness = int(current_weights[j][k] / 4)
+                    thickness = int(current_weights[j][k] / 5)
                     if thickness is 0:
                         thickness = 1
                     if thickness < 0:
@@ -76,10 +76,12 @@ class Sim(object):
 
 
 def train_with_sim(nn, X, y, epooch):
+    import time
     pygame.init()
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption('~~wow~~')
     simulation = Sim()
+    time.sleep(20)
 
     for i in range(epooch):
         predictions = nn.forward(X)
