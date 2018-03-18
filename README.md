@@ -1,1 +1,1 @@
-![Alt Text](https://github.com/elliotvilhelm/NeuralNetVisualization/raw/master/NN.gif)
+![Alt Text](https://github.com/elliotvilhelm/NeuralNetVisualization/raw/master/images/NN.gif)
